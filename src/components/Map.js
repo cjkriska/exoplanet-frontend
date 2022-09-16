@@ -46,12 +46,21 @@ function Map() {
         });
     }
 
+    const displaySystem = (e) => {
+        const system = data[e.points[0].pointNumber];
+        const name = system.host.name;
+        const numPlanets = system.numPlanets;
+        const distance = system.distance;
+        alert(name + "\n" + "Planets: " + numPlanets + "\n" + distance + " light years");
+    };
+
     return (
         <div className="">
             <div className="flex flex-row min-h-screen justify-center items-center">
+                {loading && <div>Loading....</div>}
                 {data && 
                 <Plot
-                    onClick={e => console.log(e)}
+                    onClick={e => displaySystem(e)}
                     data={[
                         {
                         x: getXData(),
