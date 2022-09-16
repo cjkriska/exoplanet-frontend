@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
+import Plot from "react-plotly.js";
 
 function Map() {
 
@@ -29,18 +30,72 @@ function Map() {
             .finally(() => setLoading(false));
     }, []);
 
+    const getXData = () => {
+        return data.map(system => {
+            return system.cartX;
+        });
+    }
+    const getYData = () => {
+        return data.map(system => {
+            return system.cartY;
+        });
+    }
+    const getZData = () => {
+        return data.map(system => {
+            return system.cartZ;
+        });
+    }
+
     return (
         <div className="">
-            <h1>Systems</h1>
-            <img className ="m-auto opacity-50 fixed" width="700" alt="Milky Way Galaxy (transparent background)" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Milky_Way_Galaxy_%28transparent_background%29.png/512px-Milky_Way_Galaxy_%28transparent_background%29.png" />
-            {loading && <div>Loading data...</div>}
-            {error && <div>{`There was a problem fetching the data - ${error}`}</div>}
-            <ul>
-                {data && data.map((system, id) => (
-                    <li key={id}>{system.host.name}</li>
-                ))}
-            </ul>
+            <div className="flex flex-row min-h-screen justify-center items-center">
+                {data && 
+                <Plot
+                    onClick={e => console.log(e)}
+                    data={[
+                        {
+                        x: getXData(),
+                        y: getYData(),
+                        z: getZData(),
+                        type: 'scatter3d',
+                        mode: 'markers',
+                        marker: {color: 'yellow', size: 2}
+                        }
+                    ]}
+                    layout={ {width: 1000, 
+                              height: 700, 
+                              title: 'A Fancy Plot', 
+                              paper_bgcolor: 'rgba(0,0,0,0)', 
+                              plot_bgcolor: 'rgba(0,0,0,0)',
+                              scene: {
+                                xaxis: {
+                                    range: [-30000, 30000]
+                                },
+                                yaxis: {
+                                    range: [-30000, 30000]
+                                },
+                                zaxis: {
+                                    range: [-30000, 30000]
+                                }
+                              }
+                            }}
+                />
+                }
+            </div>
+
+            <div className="">
+                <h1>Systems</h1>
+                <img className ="m-auto opacity-50 fixed" width="700" alt="Milky Way Galaxy (transparent background)" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Milky_Way_Galaxy_%28transparent_background%29.png/512px-Milky_Way_Galaxy_%28transparent_background%29.png" />
+                {loading && <div>Loading data...</div>}
+                {error && <div>{`There was a problem fetching the data - ${error}`}</div>}
+                <ul>
+                    {data && data.map((system, id) => (
+                        <li key={id}>{system.host.name}</li>
+                    ))}
+                </ul>
+            </div>
         </div>
+
     );
 }
 
