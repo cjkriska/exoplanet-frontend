@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import Plot from "react-plotly.js";
+import SystemModal from "./SystemModal";
 
 function Map() {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [systemModalShow, setSystemModalShow] = useState(false);
+    const [currentSystem, setCurrentSystem] = useState(null);
 
     useEffect(() => {
         fetch("http://localhost:8080/v1/systems", {
@@ -46,18 +49,25 @@ function Map() {
         });
     }
 
+    const showSystemModal = () => {
+        setSystemModalShow(!systemModalShow);
+    };
+
     const displaySystem = (e) => {
         const system = data[e.points[0].pointNumber];
-        const name = system.host.name;
-        const numPlanets = system.numPlanets;
-        const distance = system.distance;
-        alert(name + "\n" + "Planets: " + numPlanets + "\n" + distance + " light years");
+        setCurrentSystem(system);
+        showSystemModal();
     };
+
+    const getSystemNames = () => {
+        return data.map(system => system.host.name);
+    }
 
     return (
         <div className="">
             <div className="flex flex-row min-h-screen justify-center items-center">
                 {loading && <div>Loading....</div>}
+                {error && <div>{`There was a problem fetching the data - ${error}`}</div>}
                 {data && 
                 <Plot
                     onClick={e => displaySystem(e)}
@@ -66,16 +76,18 @@ function Map() {
                         x: getXData(),
                         y: getYData(),
                         z: getZData(),
+                        text: getSystemNames(),
                         type: 'scatter3d',
                         mode: 'markers',
-                        marker: {color: 'yellow', size: 2}
+                        marker: {color: 'yellow', size: 2},
+                        hovertemplate: "%{text}<extra></extra>"
                         }
                     ]}
                     layout={ {width: 1000, 
-                              height: 700, 
-                              title: 'A Fancy Plot', 
+                              height: 700,
                               paper_bgcolor: 'rgba(0,0,0,0)', 
                               plot_bgcolor: 'rgba(0,0,0,0)',
+                              hoverlabel: {bgcolor: '#FFF'},
                               scene: {
                                 xaxis: {
                                     range: [-30000, 30000]
@@ -91,17 +103,8 @@ function Map() {
                 />
                 }
             </div>
-
             <div className="">
-                <h1>Systems</h1>
-                <img className ="m-auto opacity-50 fixed" width="700" alt="Milky Way Galaxy (transparent background)" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Milky_Way_Galaxy_%28transparent_background%29.png/512px-Milky_Way_Galaxy_%28transparent_background%29.png" />
-                {loading && <div>Loading data...</div>}
-                {error && <div>{`There was a problem fetching the data - ${error}`}</div>}
-                <ul>
-                    {data && data.map((system, id) => (
-                        <li key={id}>{system.host.name}</li>
-                    ))}
-                </ul>
+                <SystemModal onClose={showSystemModal} show={systemModalShow} system={currentSystem}></SystemModal>
             </div>
         </div>
 

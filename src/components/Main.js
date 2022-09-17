@@ -4,7 +4,6 @@ import Map from "./Map";
 function Main() {
     return (
         <div>
-            <Navbar />
             <Map />
         </div>
     );
