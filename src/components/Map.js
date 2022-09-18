@@ -103,8 +103,8 @@ function Map() {
                 />
                 }
             </div>
-            <div className="">
-                <SystemModal onClose={showSystemModal} show={systemModalShow} system={currentSystem}></SystemModal>
+            <div>
+                <SystemModal onClose={showSystemModal} show={systemModalShow} system={currentSystem}/>
             </div>
         </div>
 
